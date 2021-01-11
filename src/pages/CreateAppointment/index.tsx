@@ -99,9 +99,9 @@ const CreateAppointment: React.FC = () => {
 
     if (date) {
       setSelectedDate(date);
+      setSelectedHour(0);
     }
 
-    setSelectedHour(0);
   }, []);
 
   const handleSelectHour = useCallback((hour: number) => {
@@ -193,7 +193,7 @@ const CreateAppointment: React.FC = () => {
               mode="date"
               display="calendar"
               onChange={handleDateChanged}
-              textColor="#f4ede8"
+              // textColor="#f4ede8"
               value={selectedDate}
             />
           }
