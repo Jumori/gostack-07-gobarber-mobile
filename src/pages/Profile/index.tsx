@@ -1,15 +1,9 @@
 import React, { useRef, useCallback } from 'react';
-import {
-  View,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  Alert,
-} from 'react-native';
+import { TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 import Icon from 'react-native-vector-icons/Feather';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
@@ -126,6 +120,36 @@ const Profile: React.FC = () => {
     [navigation, updateUser],
   );
 
+  const handleUpdateAvatar = useCallback(() => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        maxWidth: 400,
+      },
+      response => {
+        if (response.didCancel) {
+          return;
+        }
+
+        if (response.errorCode) {
+          Alert.alert('Erro ao atualizar seu avatar.');
+        }
+
+        const data = new FormData();
+
+        data.append('avatar', {
+          type: 'image/jpgeg',
+          name: `${user.id}.jpgeg`,
+          uri: response.uri,
+        });
+
+        api.patch('/users/avatar', data).then(apiResponse => {
+          updateUser(apiResponse.data);
+        });
+      },
+    );
+  }, [updateUser, user.id]);
+
   const handleGoBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -150,7 +174,7 @@ const Profile: React.FC = () => {
         </Header>
 
         <ContentContainer>
-          <UserAvatarButton onPress={() => {}}>
+          <UserAvatarButton onPress={handleUpdateAvatar}>
             <UserAvatar source={{ uri: user.avatar_url }} />
           </UserAvatarButton>
 
