@@ -40,4 +40,3 @@ export const OkButtonText = styled.Text`
   color: #312e38;
   font-size: 18px;
 `;
-

@@ -19,7 +19,7 @@ import {
   ProviderInfo,
   ProviderName,
   ProviderMeta,
-  ProviderMetaText
+  ProviderMetaText,
 } from './styles';
 
 export interface Provider {
@@ -36,18 +36,20 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     api.get('providers').then(response => {
-      setProviders(response.data)
-    })
+      setProviders(response.data);
+    });
   }, []);
 
   const navigateToProfile = useCallback(() => {
-    // navigate('Profile')
-    signOut()
-  }, [signOut]);
-
-  const navigateToCreateAppointment = useCallback((providerId: string) => {
-    navigate('CreateAppointment', { providerId });
+    navigate('Profile');
   }, [navigate]);
+
+  const navigateToCreateAppointment = useCallback(
+    (providerId: string) => {
+      navigate('CreateAppointment', { providerId });
+    },
+    [navigate],
+  );
 
   return (
     <Container>
@@ -69,8 +71,10 @@ const Dashboard: React.FC = () => {
           <ProvidersListTitle>Cabeleireiros</ProvidersListTitle>
         }
         renderItem={({ item: provider }) => (
-          <ProviderContainer onPress={() => navigateToCreateAppointment(provider.id)}>
-            <ProviderAvatar source={{ uri: provider.avatar_url}} />
+          <ProviderContainer
+            onPress={() => navigateToCreateAppointment(provider.id)}
+          >
+            <ProviderAvatar source={{ uri: provider.avatar_url }} />
 
             <ProviderInfo>
               <ProviderName>{provider.name}</ProviderName>

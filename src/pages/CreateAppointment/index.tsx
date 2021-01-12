@@ -33,6 +33,7 @@ import {
   CreateAppointmentButton,
   CreateAppointmentButtonText,
 } from './styles';
+
 interface RouteParams {
   providerId: string;
 }
@@ -56,7 +57,9 @@ const CreateAppointment: React.FC = () => {
   const routeParams = route.params as RouteParams;
 
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState(routeParams.providerId);
+  const [selectedProvider, setSelectedProvider] = useState(
+    routeParams.providerId,
+  );
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedHour, setSelectedHour] = useState(0);
   const [availability, setAvailability] = useState<AvailabilityItem[]>([]);
@@ -64,20 +67,22 @@ const CreateAppointment: React.FC = () => {
 
   useEffect(() => {
     api.get('providers').then(response => {
-      setProviders(response.data)
-    })
+      setProviders(response.data);
+    });
   }, []);
 
   useEffect(() => {
-    api.get(`providers/${selectedProvider}/day-availability`, {
-      params: {
-        year: selectedDate.getFullYear(),
-        month: selectedDate.getMonth() + 1,
-        day: selectedDate.getDate(),
-      },
-    }).then(response => {
-      setAvailability(response.data);
-    });
+    api
+      .get(`providers/${selectedProvider}/day-availability`, {
+        params: {
+          year: selectedDate.getFullYear(),
+          month: selectedDate.getMonth() + 1,
+          day: selectedDate.getDate(),
+        },
+      })
+      .then(response => {
+        setAvailability(response.data);
+      });
   }, [selectedDate, selectedProvider]);
 
   const navigateBack = useCallback(() => {
@@ -86,23 +91,25 @@ const CreateAppointment: React.FC = () => {
 
   const handleSelectProvider = useCallback((providerId: string) => {
     setSelectedProvider(providerId);
-  } , []);
+  }, []);
 
   const handleToggleDatePicker = useCallback(() => {
     setShowDatePicker(state => !state);
   }, []);
 
-  const handleDateChanged = useCallback((event: any, date: Date | undefined) => {
-    if (Platform.OS === 'android') {
-      setShowDatePicker(false);
-    }
+  const handleDateChanged = useCallback(
+    (event: any, date: Date | undefined) => {
+      if (Platform.OS === 'android') {
+        setShowDatePicker(false);
+      }
 
-    if (date) {
-      setSelectedDate(date);
-      setSelectedHour(0);
-    }
-
-  }, []);
+      if (date) {
+        setSelectedDate(date);
+        setSelectedHour(0);
+      }
+    },
+    [],
+  );
 
   const handleSelectHour = useCallback((hour: number) => {
     setSelectedHour(hour);
@@ -118,35 +125,39 @@ const CreateAppointment: React.FC = () => {
       await api.post('appointments', {
         provider_id: selectedProvider,
         date,
-      })
+      });
 
-      navigate('AppointmentCreated', { date: date.getTime() })
+      navigate('AppointmentCreated', { date: date.getTime() });
     } catch (error) {
       Alert.alert(
         'Erro ao criar agendamento',
-        'Ocorreu um erro ao tentar criar um agendamento, tente novamente.'
-      )
+        'Ocorreu um erro ao tentar criar um agendamento, tente novamente.',
+      );
     }
   }, [navigate, selectedDate, selectedHour, selectedProvider]);
 
   const morningAvailability = useMemo(() => {
-    return availability.filter(({ hour }) => hour < 12).map(({ hour, available }) => {
-      return {
-        hour,
-        available,
-        hourFormated: format(new Date().setHours(hour), 'HH:00'),
-      }
-    })
+    return availability
+      .filter(({ hour }) => hour < 12)
+      .map(({ hour, available }) => {
+        return {
+          hour,
+          available,
+          hourFormated: format(new Date().setHours(hour), 'HH:00'),
+        };
+      });
   }, [availability]);
 
   const afternoonAvailability = useMemo(() => {
-    return availability.filter(({ hour }) => hour >= 12).map(({ hour, available }) => {
-      return {
-        hour,
-        available,
-        hourFormated: format(new Date().setHours(hour), 'HH:00'),
-      }
-    })
+    return availability
+      .filter(({ hour }) => hour >= 12)
+      .map(({ hour, available }) => {
+        return {
+          hour,
+          available,
+          hourFormated: format(new Date().setHours(hour), 'HH:00'),
+        };
+      });
   }, [availability]);
 
   return (
@@ -174,9 +185,9 @@ const CreateAppointment: React.FC = () => {
                 selected={provider.id === selectedProvider}
               >
                 <ProviderAvatar source={{ uri: provider.avatar_url }} />
-                <ProviderName
-                  selected={provider.id === selectedProvider}
-                >{provider.name}</ProviderName>
+                <ProviderName selected={provider.id === selectedProvider}>
+                  {provider.name}
+                </ProviderName>
               </ProviderContainer>
             )}
           />
@@ -188,7 +199,7 @@ const CreateAppointment: React.FC = () => {
             <OpenDatePickerText>Selecionar outra data</OpenDatePickerText>
           </OpenDatePickerButton>
 
-          {showDatePicker &&
+          {showDatePicker && (
             <DateTimePicker
               mode="date"
               display="calendar"
@@ -196,7 +207,7 @@ const CreateAppointment: React.FC = () => {
               // textColor="#f4ede8"
               value={selectedDate}
             />
-          }
+          )}
         </Calendar>
 
         <Schedule>
@@ -213,7 +224,9 @@ const CreateAppointment: React.FC = () => {
                   available={available}
                   key={hourFormated}
                 >
-                  <HourText selected={selectedHour === hour}>{hourFormated}</HourText>
+                  <HourText selected={selectedHour === hour}>
+                    {hourFormated}
+                  </HourText>
                 </Hour>
               ))}
             </SectionContent>
@@ -222,17 +235,21 @@ const CreateAppointment: React.FC = () => {
           <Section>
             <SectionTitle>Tarde</SectionTitle>
             <SectionContent>
-              {afternoonAvailability.map(({ hourFormated, hour, available }) => (
-                <Hour
-                  enabled={available}
-                  selected={selectedHour === hour}
-                  onPress={() => handleSelectHour(hour)}
-                  available={available}
-                  key={hourFormated}
-                >
-                  <HourText selected={selectedHour === hour}>{hourFormated}</HourText>
-                </Hour>
-              ))}
+              {afternoonAvailability.map(
+                ({ hourFormated, hour, available }) => (
+                  <Hour
+                    enabled={available}
+                    selected={selectedHour === hour}
+                    onPress={() => handleSelectHour(hour)}
+                    available={available}
+                    key={hourFormated}
+                  >
+                    <HourText selected={selectedHour === hour}>
+                      {hourFormated}
+                    </HourText>
+                  </Hour>
+                ),
+              )}
             </SectionContent>
           </Section>
         </Schedule>

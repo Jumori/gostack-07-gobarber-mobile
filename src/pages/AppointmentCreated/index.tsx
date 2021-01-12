@@ -5,7 +5,13 @@ import Icon from 'react-native-vector-icons/Feather';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
-import { Container, Title, Description, OkButton, OkButtonText } from './styles';
+import {
+  Container,
+  Title,
+  Description,
+  OkButton,
+  OkButtonText,
+} from './styles';
 
 interface RouteParams {
   date: number;
@@ -22,18 +28,18 @@ const AppointmentCreated: React.FC = () => {
       routes: [
         {
           name: 'Dashboard',
-        }
+        },
       ],
       index: 0,
-    })
+    });
   }, [reset]);
 
   const formatedDate = useMemo(() => {
     return format(
       routeParams.date,
       "EEEE', dia 'dd' de 'MMMM' de 'yyyy' às 'HH:mm'h'",
-      { locale: ptBR }
-    )
+      { locale: ptBR },
+    );
   }, [routeParams.date]);
 
   return (
